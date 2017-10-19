@@ -1,0 +1,19 @@
+package org.apache.wordcount2
+
+import org.apache.spark.{SparkContext,SparkConf}
+import org.apache.spark.SparkContext._
+object wordcount2 {
+  
+  def main(args:Array[String]): Unit = {
+    val sc = new SparkContext("local", "wordcount2", new SparkConf())
+    try {
+      val out = "/FileStore/output/kjv-wc2"
+     
+      val input = sc.textFile("/FileStore/tables/q3fjlad61508438309181/kjvdat.txt").map(line=>line.toLowerCase)
+      val wc=input.flatMap(line=>line.split("""[^\p{IsAlphabetic}]+""")).map(word=>(word,1)).reduceByKey((count1,count2)=>count1+count2)
+       println(s"Writing output to: $out")
+       wc.saveAsTextFile(out)
+    }
+    finally{sc.stop}
+  }
+}
